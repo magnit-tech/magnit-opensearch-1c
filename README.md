@@ -1,0 +1,1 @@
+# magnit-opensearch-1c
