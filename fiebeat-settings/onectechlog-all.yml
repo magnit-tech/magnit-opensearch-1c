@@ -1,0 +1,15 @@
+- type: log
+  enabled: true
+  paths:
+    - D:\tech\logs\all\*_COMMON\**\*.log
+    - D:\tech\logs\all\*_LONGDURATIONINFO\**\*.log
+    - D:\tech\logs\all\*_TLOCK\**\*.log
+  
+  fields:
+    log_type: all
+    log_timezone: Europe/Moscow
+
+  multiline.pattern: ^\d{2}:\d{2}\.\d{6}
+  multiline.negate: true
+  multiline.match: after
+  multiline.max_lines: 1000 

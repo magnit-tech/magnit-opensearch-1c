@@ -1,0 +1,72 @@
+---
+# This is the internal user database
+# The hash value is a bcrypt hash and can be generated with plugin/tools/hash.sh
+
+_meta:
+  type: "internalusers"
+  config_version: 2
+
+# Define your internal users here
+
+## Demo users
+
+admin:
+  hash: "...some_hash..."
+  reserved: true
+  backend_roles:
+  - "admin"
+  - "security_rest_api_access"
+  - "security_rest_api_full_access"
+  description: "Demo admin user"
+
+anomalyadmin:
+  hash: "...some_hash..."
+  reserved: false
+  opendistro_security_roles:
+  - "anomaly_full_access"
+  description: "Demo anomaly admin user, using internal role"
+
+kibanaserver:
+  hash: "...some_hash..."
+  reserved: true
+  description: "Demo OpenSearch Dashboards user"
+
+kibanaro:
+  hash: "...some_hash..."
+  reserved: false
+  backend_roles:
+  - "kibanauser"
+  - "readall"
+  attributes:
+    attribute1: "value1"
+    attribute2: "value2"
+    attribute3: "value3"
+  description: "Demo OpenSearch Dashboards read only user, using external role mapping"
+
+logstash:
+  hash: "...some_hash..."
+  reserved: false
+  backend_roles:
+  - "logstash"
+  description: "Demo logstash user, using external role mapping"
+
+readall:
+  hash: "...some_hash..."
+  reserved: false
+  backend_roles:
+  - "readall"
+  description: "Demo readall user, using external role mapping"
+
+snapshotrestore:
+  hash: "...some_hash..."
+  reserved: false
+  backend_roles:
+  - "snapshotrestore"
+  description: "Demo snapshotrestore user, using external role mapping"
+
+some_filebeat_user:
+  hash: "...some_hash..."
+  reserved: true
+  backend_roles:
+  - "admin"
+  description: "some_filebeat_user"

@@ -1,0 +1,13 @@
+- type: log
+  enabled: true
+  paths:
+    - D:\tech\logs\all\*_ADMIN\**\*.log
+  
+  fields:
+    log_type: admin
+    log_timezone: Europe/Moscow
+
+  multiline.pattern: ^\d{2}:\d{2}\.\d{6}
+  multiline.negate: true
+  multiline.match: after
+  multiline.max_lines: 1000 

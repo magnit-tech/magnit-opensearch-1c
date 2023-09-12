@@ -1,0 +1,36 @@
+filebeat.config.inputs:
+ 
+  enable: true
+  path: configs\*.yml
+  reload.enabled: true
+  reload.period: 10s
+
+max_procs: 2
+  
+#output.console:
+#  enabled: true
+
+setup.template.name: "techlog"
+setup.template.pattern: "techlog-*"
+setup.template.overwrite: true
+setup.template.json.enabled: true
+setup.template.json.path: "techlog.template.json"
+setup.template.json.name: "techlog"
+
+setup.ilm.enabled: false
+setup.ilm.check_exists: false
+
+output.elasticsearch:
+  hosts: ["some_host_name:9200"]
+  protocol: https
+  username: "filebeat_user"
+  password: "filebeat_user_password"
+  pipeline: techlog
+  indices:
+    - index: "techlog-%{[fields.log_type]}-%{[host.name]}-%{+yyyy.MM.dd}"
+      when.contains:
+        fields.log_type: "all"
+    - index: "techlog-%{[fields.log_type]}-%{+yyyy.MM.dd}"
+      when.contains:
+        fields.log_type: "admin"
+  ssl.verification_mode: none

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://v8.1c.ru/v8/tech-log">
+    <!-- Логи основных событий -->
+    <log location="/var/1C/1540/log"
+            history="3">
+        <event>
+            <!-- Настройка для получения действий администратора -->
+            <eq property="Name"
+                    value="ADMIN"/>
+        </event>
+        <event>
+            <!-- Настройка для получения действий изменяющих работу кластера серверов -->
+            <eq property="Name"
+                    value="CLSTR"/>
+        </event>
+        <event>
+            <!-- Настройка для получения записей подсистемы мониторинга кластера -->
+            <eq property="Name"
+                    value="ATTN"/>
+        </event>
+        <event>
+            <!-- Настройка для получения событий процесса -->
+            <eq property="Name"
+                    value="PROC"/>
+        </event>
+        <event>
+            <!-- Настройка для получения событий соединений -->
+            <eq property="Name"
+                    value="CONN"/>
+        </event>
+        <event>
+            <!-- Настройка для получения событий исключительных ситуаций -->
+            <eq property="Name"
+                    value="EXCP"/>
+        </event>
+        <event>
+            <!-- Настройка для получения ошибок компиляции запросов -->
+            <eq property="Name"
+                    value="QERR"/>
+        </event>
+        <property name="all"/>
+    </log>
+    <!-- Настройка для управляемых блокировок -->
+    <log location="/var/1C/1540/log"
+            history="3">
+        <event>
+            <eq property="Name"
+                    value="TLOCK"/>
+            <ne property="WaitConnections"
+                    value=""/>
+        </event>
+        <event>
+            <eq property="Name"
+                    value="TTIMEOUT"/>
+        </event>
+        <event>
+            <eq property="Name"
+                    value="TDEADLOCK"/>
+        </event>
+        <property name="all"/>
+    </log>
+    <!-- Настройка для получения записей подсистемы мониторинга кластера -->
+    <log location="/var/1C/1540/log" history="3">
+        <event>
+            <eq property="Name" value="ADMIN" />
+        </event>
+        <property name="all" />
+    </log>
+    <!-- Логи событий длительных операций -->
+    <log location="/var/1C/1540/log"
+            history="3">
+        <event>
+            <ne property="Name"
+                    value=""/>
+            <ne property="Name"
+                    value="PROC"/>
+            <ne property="Name"
+                    value="CONN"/>
+            <ne property="Name"
+                    value="TLOCK"/>
+            <gt property="Duration"
+                    value="10000"/>
+        </event>
+        <property name="all"/>
+    </log>  
+</config>

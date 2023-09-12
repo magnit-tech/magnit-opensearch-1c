@@ -1,0 +1,940 @@
+{
+  "description": "techlog pipeline common",
+  "processors": [
+    {
+      "grok": {
+        "field": "log.file.path",
+        "patterns": [
+          "\\\\%{USER:onectechlog.onecserver}_%{USER:onectechlog.logname}\\\\%{USER:onectechlog.process}_%{INT:onectechlog.pid}\\\\%{INT}.log"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "%{INT:_ingest.tempmm}:%{BASE10NUM:_ingest.tempss}-%{INT:duration},(%{WORD:event})?,%{INT:level}"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "log.file.path",
+        "patterns": [
+          "%{INT:_ingest.tempyymmddhh}.log"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "_ingest.tempdate",
+        "value": "{{_ingest.tempyymmddhh}}{{_ingest.tempmm}}{{_ingest.tempss}}"
+      }
+    },
+    {
+      "date": {
+        "field": "_ingest.tempdate",
+        "target_field": "@timestamp",
+        "formats": [
+          "yyMMddHHmmss.SSSSSS"
+        ],
+        "timezone": "{{fields.log_timezone}}"
+      }
+    },
+    {
+      "set": {
+        "field": "LogTimestamp",
+        "value": "{{_ingest.tempdate}}"
+      }
+    },
+    {
+      "set": {
+        "field": "_id",
+        "value": "{{_ingest.tempdate}}-{{_source.log.offset}}"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "process=%{DATA:process},"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "process",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "SrcName=%{DATA:SrcName},"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "SrcName",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "p:processName=%{DATA:pprocessName},"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "pprocessName",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "t:connectID=%{DATA:tconnectID},"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "tconnectID",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "uppercase": {
+        "field": "pprocessName"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "t:applicationName=%{DATA:tapplicationName},"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "tapplicationName",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "t:computerName=%{DATA:tcomputerName},"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "tcomputerName",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "SessionID=%{DATA:SessionID}(,|\\()"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "SessionID",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "SessionID=[0-9]+\\(%{DATA:OwnerSessionID:join}\\),"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "OwnerSessionID",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Usr=%{DATA:Usr},"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Usr",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Exception=%{DATA:Exception},"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Exception",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "RetExcp=(%{QS:RetExcp},|%{onecstr:RetExcp}|%{DATA:RetExcp},|%{GREEDYDATA:RetExcp})"
+        ],
+        "pattern_definitions": {
+          "onecstr": "('(?m)(.*)')|(\"(?m)(.*)\")"
+        },
+        "on_failure": [
+          {
+            "set": {
+              "field": "RetExcp",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Descr=(%{QS:Descr},|%{onecstr:Descr}|%{DATA:Descr},|%{GREEDYDATA:Descr})"
+        ],
+        "pattern_definitions": {
+          "onecstr": "('(?m)(.*)')|(\"(?m)(.*)\")"
+        },
+        "on_failure": [
+          {
+            "set": {
+              "field": "Descr",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          ",DumpError=(%{DATA:DumpError},|%{GREEDYDATA:DumpError})"
+        ],
+        "if": "ctx.message =~ /,DumpError=/"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          ",DumpError=.*\\\\%{DATA:DumpedProcessType}\\_8\\.[0-9]\\.[0-9]{2}\\.[0-9]{4}\\_[^_]{8}\\_[0-9]{14}\\_%{NUMBER:DumpedProcessPID}\\.mdmp"
+        ],
+        "if": "ctx.message =~ /,DumpError=/"
+      }
+    },
+    {
+      "set": {
+        "field": "DumpedProcess",
+        "value": "{{DumpedProcessType}}_{{DumpedProcessPID}}",
+        "if": "ctx.message =~ /,DumpError=/"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          ",Context=(%{QS:Context}|%{onecstr:Context}|%{DATA:Context},|%{GREEDYDATA:Context})"
+        ],
+        "pattern_definitions": {
+          "onecstr": "('(?m)(.*)')|(\"(?m)(.*)\")"
+        },
+        "if": "ctx.message =~ /,Context=/"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          ",Context=(%{QS:CompoundContext}|%{onecstr:CompoundContext}|%{DATA:CompoundContext},|%{GREEDYDATA:CompoundContext})"
+        ],
+        "pattern_definitions": {
+          "onecstr": "('(?m)(.*)')|(\"(?m)(.*)\")"
+        },
+        "if": "ctx.message =~ /,Context=/"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          ",CALL.*,Module=%{DATA:Module},.*Method=%{DATA:Method},"
+        ],
+        "if": "ctx.message =~ /,CALL.*,Module=.*,Method=/"
+      }
+    },
+    {
+      "set": {
+        "field": "CompoundContext",
+        "value": "BGJob:{{Module}}.{{Method}}",
+        "if": "ctx.message =~ /,CALL.*,Module=.*,Method=/"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          ",CALL.*,Report=%{DATA:CompoundContext},"
+        ],
+        "if": "ctx.message =~ /,CALL.*,Report=.*/"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          ",CALL.*,Form=%{DATA:form},.*FormItem=%{DATA:formitem},"
+        ],
+        "if": "ctx.message =~ /,CALL.*,Form=.*,FormItem=/"
+      }
+    },
+    {
+      "set": {
+        "field": "CompoundContext",
+        "value": "DLSearch:{{form}}.{{formitem}}",
+        "if": "ctx.message =~ /,CALL.*,Form=.*,FormItem=/"
+      }
+    },
+    {
+      "set": {
+        "field": "CompoundContext",
+        "value": "Grid search",
+        "if": "ctx.message =~ /,CALL.*,Func=Grid search/"
+      }
+    },
+    {
+      "set": {
+        "field": "CompoundContext",
+        "value": "Global search",
+        "if": "ctx.message =~ /,CALL.*,Func=Global search/"
+      }
+    },
+    {
+      "set": {
+        "field": "CompoundContext",
+        "value": "Full-text search index update background job",
+        "if": "ctx.message =~ /,CALL.*,Func=Full-text search index update background job/"
+      }
+    },
+    {
+      "set": {
+        "field": "SQLLockError",
+        "value": "timeout",
+        "if": "ctx.message =~ /request time out/"
+      }
+    },
+    {
+      "set": {
+        "field": "SQLLockError",
+        "value": "deadlock",
+        "if": "ctx.message =~ /deadlock victim/"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Context=(%{firstline:FirstLineContext}|%{DATA:FirstLineContext},|%{GREEDYDATA:FirstLineContext})"
+        ],
+        "pattern_definitions": {
+          "firstline": "('|\")\n?(.*)"
+        },
+        "on_failure": [
+          {
+            "set": {
+              "field": "FirstLineContext",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "gsub": {
+        "field": "FirstLineContext",
+        "pattern": "('|\"|\n)",
+        "replacement": ""
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "dbpid=(%{DATA:dbpid},|%{GREEDYDATA:dbpid})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "dbpid",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Txt=(%{QS:Txt}|%{DATA:Txt},|%{GREEDYDATA:Txt})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Txt",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Sql=(%{QS:Sql}|%{DATA:Sql},|%{GREEDYDATA:Sql})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Sql",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "Sql",
+        "patterns": [
+          "%{SqlParameters:SqlParameters}"
+        ],
+        "pattern_definitions": {
+          "SqlParameters": "(p_.*(\n))+"
+        },
+        "on_failure": [
+          {
+            "set": {
+              "field": "SqlParameters",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "gsub": {
+        "field": "Sql",
+        "pattern": "p_.*(\n)",
+        "replacement": ""
+      }
+    },
+    {
+      "gsub": {
+        "field": "Sql",
+        "pattern": "#tt[0-9]*",
+        "replacement": "TEMPTABLE"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Rows=(%{DATA:Rows},|%{GREEDYDATA:Rows})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Rows",
+              "value": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "RowsAffected=(%{DATA:RowsAffected},|%{GREEDYDATA:RowsAffected})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "RowsAffected",
+              "value": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Prm=(%{QS:Prm}|%{DATA:Prm},|%{GREEDYDATA:Prm})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Prm",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Interface=(%{DATA:Interface},|%{GREEDYDATA:Interface})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Interface",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "IName=(%{DATA:IName},|%{GREEDYDATA:IName})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "IName",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Method=(%{DATA:Method},|%{GREEDYDATA:Method})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Method",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "CallID=(%{DATA:CallID},|%{GREEDYDATA:CallID})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "CallID",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "MName=(%{DATA:MName},|%{GREEDYDATA:MName})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "MName",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Memory=(%{DATA:Memory},|%{GREEDYDATA:Memory})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Memory",
+              "value": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "MemoryPeak=(%{DATA:MemoryPeak},|%{GREEDYDATA:MemoryPeak})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "MemoryPeak",
+              "value": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "InBytes=(%{DATA:InBytes},|%{GREEDYDATA:InBytes})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "InBytes",
+              "value": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "OutBytes=(%{DATA:OutBytes},|%{GREEDYDATA:OutBytes})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "OutBytes",
+              "value": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "CpuTime=(%{DATA:CpuTime},|%{GREEDYDATA:CpuTime})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "CpuTime",
+              "value": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Func=(%{QS:Func}|%{DATA:Func},|%{GREEDYDATA:Func})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Func",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          ",Func=.*,Func=(%{QS:Func2}|%{DATA:Func2},|%{GREEDYDATA:Func2})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Func2",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Module=(%{DATA:Module},|%{GREEDYDATA:Module})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "Module",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Regions=(%{QS:Regions}|%{onecstr:Regions}|%{DATA:Regions},|%{GREEDYDATA:Regions})"
+        ],
+        "pattern_definitions": {
+          "onecstr": "('(?m)(.*)')|(\"(?m)(.*)\")"
+        },
+        "on_failure": [
+          {
+            "set": {
+              "field": "Regions",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Locks=(%{QS:Locks}|%{onecstr:Locks}|%{DATA:Locks},|%{GREEDYDATA:Locks})"
+        ],
+        "pattern_definitions": {
+          "onecstr": "('(?m)(.*)')|(\"(?m)(.*)\")"
+        },
+        "on_failure": [
+          {
+            "set": {
+              "field": "Locks",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "WaitConnections=(%{INT:WaitConnections}|%{QS:WaitConnections})"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "WaitConnections",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "DeadlockConnectionIntersections=(%{QS:DeadlockConnectionIntersections}|%{onecstr:DeadlockConnectionIntersections}|%{DATA:DeadlockConnectionIntersections},|%{GREEDYDATA:DeadlockConnectionIntersections})"
+        ],
+        "pattern_definitions": {
+          "onecstr": "('(?m)(.*)')|(\"(?m)(.*)\")"
+        },
+        "on_failure": [
+          {
+            "set": {
+              "field": "DeadlockConnectionIntersections",
+              "value": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "address=%{HOSTPORT:address}.*avgResponseTime=%{INT:avgResponseTime},maxResponseTime=%{INT:maxResponseTime},packetsTimedOut=%{INT:packetsTimedOut}"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "address",
+              "value": ""
+            }
+          },
+          {
+            "set": {
+              "field": "avgResponseTime",
+              "value": 0
+            }
+          },
+          {
+            "set": {
+              "field": "maxResponseTime",
+              "value": 0
+            }
+          },
+          {
+            "set": {
+              "field": "packetsTimedOut",
+              "value": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "cpu:%{INT:CPU} QueueLength:%{INT:QueueLength} queueLength/numCPU:%{INT:QueueLengthNumCPU} memDur:%{INT:MemDur} file:%{INT:FileCLSTR} sql:%{INT:SqlCLSTR} fsql:%{INT:FSqlCLSTR} result:%{INT:ResultCLSTR}"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "CPU",
+              "value": 0
+            }
+          },
+          {
+            "set": {
+              "field": "QueueLength",
+              "value": 0
+            }
+          },
+          {
+            "set": {
+              "field": "QueueLengthNumCPU",
+              "value": 0
+            }
+          },
+          {
+            "set": {
+              "field": "MemDur",
+              "value": 0
+            }
+          },
+          {
+            "set": {
+              "field": "FileCLSTR",
+              "value": 0
+            }
+          },
+          {
+            "set": {
+              "field": "SqlCLSTR",
+              "value": 0
+            }
+          },
+          {
+            "set": {
+              "field": "FSqlCLSTR",
+              "value": 0
+            }
+          },
+          {
+            "set": {
+              "field": "ResultCLSTR",
+              "value": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "Query=(%{QS:Query}|%{onecstr:Query}|%{DATA:Query},|%{GREEDYDATA:Query})"
+        ],
+        "pattern_definitions": {
+          "onecstr": "('(?m)(.*)')|(\"(?m)(.*)\")"
+        },
+        "on_failure": [
+          {
+            "set": {
+              "field": "Query",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error",
+        "value": "{{_ingest.on_failure_message}}"
+      }
+    }
+  ]
+}
