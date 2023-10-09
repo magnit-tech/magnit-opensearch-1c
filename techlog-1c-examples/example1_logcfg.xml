@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns="http://v8.1c.ru/v8/tech-log">
     <!-- Логи основных событий -->
-    <log location="/var/1C/1540/log"
+    <log location="E:\tech\logs\all\SOME_HOST_COMMON"
             history="3">
         <event>
             <!-- Настройка для получения действий администратора -->
@@ -41,7 +41,7 @@
         <property name="all"/>
     </log>
     <!-- Настройка для управляемых блокировок -->
-    <log location="/var/1C/1540/log"
+    <log location="E:\tech\logs\all\SOME_HOST_TLOCK"
             history="3">
         <event>
             <eq property="Name"
@@ -60,14 +60,14 @@
         <property name="all"/>
     </log>
     <!-- Настройка для получения записей подсистемы мониторинга кластера -->
-    <log location="/var/1C/1540/log" history="3">
+    <log location="E:\tech\logs\all\SOME_HOST_ADMIN" history="3">
         <event>
             <eq property="Name" value="ADMIN" />
         </event>
         <property name="all" />
     </log>
     <!-- Логи событий длительных операций -->
-    <log location="/var/1C/1540/log"
+    <log location="E:\tech\logs\all\SOME_HOST_LONGDURATIONINFO"
             history="3">
         <event>
             <ne property="Name"
