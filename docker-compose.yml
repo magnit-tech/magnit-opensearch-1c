@@ -1,6 +1,7 @@
 version: "3"
 services:
   opensearch-node1:
+    restart: always
     image: opensearchproject/opensearch:latest
     container_name: opensearch-node1
     environment:
@@ -8,6 +9,8 @@ services:
       - compatibility.override_main_response_version=true
       - plugins.security.disabled=false      
       - plugins.security.restapi.roles_enabled=["all_access"]
+      - cluster.default_number_of_replicas=0
+      - path.repo=["/usr/share/opensearch/data/repo"]
     volumes: 
       - /var/elk/data:/usr/share/opensearch/data      
       - /var/elk/opensearch-security/config.yml:/usr/share/opensearch/config/opensearch-security/config.yml
@@ -22,6 +25,7 @@ services:
       - 9200:9200 # REST API
       - 9600:9600 # Performance Analyzer
   opensearch-dashboards:
+    restart: always
     image: opensearchproject/opensearch-dashboards:latest # Make sure the version of opensearch-dashboards matches the version of opensearch installed on other nodes
     container_name: opensearch-dashboards
     ports:
