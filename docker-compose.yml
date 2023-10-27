@@ -10,7 +10,7 @@ services:
       - plugins.security.disabled=false      
       - plugins.security.restapi.roles_enabled=["all_access"]
       - cluster.default_number_of_replicas=0
-      - path.repo=["/usr/share/opensearch/data/repo"]
+      - "path.repo=/usr/share/opensearch/data/repo"
     volumes: 
       - /var/elk/data:/usr/share/opensearch/data      
       - /var/elk/opensearch-security/config.yml:/usr/share/opensearch/config/opensearch-security/config.yml
